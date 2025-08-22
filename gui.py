@@ -7,7 +7,6 @@ import threading
 
 class SmartDeviceController:
     def __init__(self):
-        # Load device configuration
         try:
             self.device_config = json.load(open("device_info.json"))
             self.DEVICE_ID = self.device_config["DEVICE_ID"]
@@ -18,18 +17,14 @@ class SmartDeviceController:
             print("device_info.json not found!")
             return
         
-        # Device parameters
         self.FAN_DP = "1"
         self.FAN_SPEED_DP = "4"
         self.LIGHT_DP = "5"
         
-        # Initialize device connection
         self.setup_device()
         
-        # Create GUI
         self.create_gui()
         
-        # Get initial status
         self.update_status()
     
     def is_alive(self, ip, port=6668, timeout=1):
@@ -43,7 +38,6 @@ class SmartDeviceController:
             return False
     
     def setup_device(self):
-        # Check if device is reachable
         if not self.is_alive(self.DEVICE_IP):
             print(f"Device at {self.DEVICE_IP} is not reachable. Updating Device IP....")
             try:
@@ -56,7 +50,6 @@ class SmartDeviceController:
             except Exception as e:
                 print(f"Error scanning for devices: {e}")
         
-        # Initialize device
         self.device = tinytuya.OutletDevice(
             dev_id=self.DEVICE_ID,
             address=self.DEVICE_IP,
@@ -70,22 +63,18 @@ class SmartDeviceController:
         self.root.geometry("250x200")
         self.root.resizable(False, False)
         
-        # Position window at bottom-right corner
         self.root.update_idletasks()
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
-        x = screen_width - 270  # 250 + 20 margin
-        y = screen_height - 250  # 200 + 50 margin
+        x = screen_width - 270  
+        y = screen_height - 250 
         self.root.geometry(f"250x200+{x}+{y}")
         
-        # Set window to stay on top
         self.root.attributes('-topmost', True)
         
-        # Main frame
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
-        # Light control
         light_frame = ttk.LabelFrame(main_frame, text="Light Control", padding="5")
         light_frame.grid(row=0, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
         
@@ -99,8 +88,6 @@ class SmartDeviceController:
             width=15
         )
         self.light_button.pack()
-        
-        # Fan control
         fan_frame = ttk.LabelFrame(main_frame, text="Fan Control", padding="5")
         fan_frame.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
         
@@ -114,8 +101,6 @@ class SmartDeviceController:
             width=15
         )
         self.fan_button.pack(pady=(0, 5))
-        
-        # Fan speed control
         speed_frame = ttk.Frame(fan_frame)
         speed_frame.pack(fill=tk.X)
         
@@ -134,15 +119,12 @@ class SmartDeviceController:
         
         self.speed_label = ttk.Label(speed_frame, text="50")
         self.speed_label.pack(side=tk.RIGHT)
-        
-        # Status frame
         status_frame = ttk.Frame(main_frame)
         status_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E))
         
         self.status_label = ttk.Label(status_frame, text="Status: Connecting...", font=("Arial", 8))
         self.status_label.pack()
         
-        # Initialize states
         self.light_state = False
         self.fan_state = False
         self.current_speed = 50
@@ -168,8 +150,6 @@ class SmartDeviceController:
     def on_speed_change(self, value):
         speed = int(float(value))
         self.speed_label.config(text=str(speed))
-        
-        # Debounce - only send command after user stops moving slider
         if hasattr(self, 'speed_timer'):
             self.root.after_cancel(self.speed_timer)
         
@@ -201,8 +181,6 @@ class SmartDeviceController:
                 status = self.device.status()
                 if status and 'dps' in status:
                     dps = status['dps']
-                    
-                    # Update states based on device status
                     if self.LIGHT_DP in dps:
                         self.light_state = dps[self.LIGHT_DP]
                         self.root.after(0, self.update_light_button)
@@ -222,12 +200,9 @@ class SmartDeviceController:
                     self.root.after(0, lambda: self.status_label.config(text="No response"))
             except Exception as e:
                 self.root.after(0, lambda: self.status_label.config(text=f"Error: {str(e)[:20]}..."))
-        
-        # Run status update in background thread
         threading.Thread(target=get_status, daemon=True).start()
     
     def run(self):
-        # Update status every 5 seconds
         def periodic_update():
             self.update_status()
             self.root.after(5000, periodic_update)
