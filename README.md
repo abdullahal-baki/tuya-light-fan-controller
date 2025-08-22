@@ -2,6 +2,9 @@
 
 Control Tuya-based light + fan combo devices locally using Python and tinytuya.
 
+<img width="335" height="286" alt="image" src="https://github.com/user-attachments/assets/aaf5cbef-9e4c-4e2f-9ba1-46e31ff720dc" />
+
+
 ## Overview
 
 This script relies on `tinytuya` to interface with your device via LAN. It supports:
