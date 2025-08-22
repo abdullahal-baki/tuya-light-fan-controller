@@ -2,3 +2,5 @@ response.json
 device_raw_data.json
 test.py
 __pycache__/*
+device_info.json
+device_info.json
