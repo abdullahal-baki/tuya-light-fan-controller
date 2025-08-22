@@ -6,7 +6,7 @@ import tinytuya
 import threading
 
 class SmartDeviceController:
-    def __init__(self):
+    def __init__(self): 
         try:
             self.device_config = json.load(open("device_info.json"))
             self.DEVICE_ID = self.device_config["DEVICE_ID"]
