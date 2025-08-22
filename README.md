@@ -11,7 +11,6 @@ This script relies on `tinytuya` to interface with your device via LAN. It suppo
 
 - Turning the device on/off
 - Selecting fan speeds
-- Adjusting light brightness/color
 
 ## Prerequisites
 
